@@ -1,31 +1,34 @@
-const express = require ('express');
-const mongoose = require ('mongoose');
-const connectToDB = require ('./db.js');
-const Product = require('./models/product.model.js');
-const productRoute = require('./routes/product.route.js')
-const app = express();
+const express = require('express');
+const mongoose = require('mongoose');
+const connectToDB = require('./db.js');
+const appRouter = require('./app.js'); // Import appRouter
+//const router = require (''); //import router
 
+const app = express();
 const PORT = 8000;
 
-connectToDB().then (() => {
+// Connect to Database
+connectToDB()
+  .then(() => {
+    console.log('✅ Connected to Database Successfully');
 
-   // middleware
-app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+    // Middleware (Apply JSON parsing)
+    app.use(express.json()); 
+    app.use(express.urlencoded({ extended: false }));
 
-//routes
-app.use('/api/v1/products', productRoute);
+    // Use appRouter to register routes
+    app.use('/api/v1', appRouter);
 
-app.get('/', (req, res) => {
-   console.log('hello World')
-   res.send(`<h1>
-      Homepage
-      </h1>`);
-});
+    // Root Route
+    app.get('/', (req, res) => {
+      res.send('<h1>Homepage</h1>');
+    });
 
-
-app.listen(PORT, () => {
-   console.log(`Server is running on port: http://localhost:${PORT}`);
-});
-
-});
+    // Start Server
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running at: http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('❌ Database Connection Failed:', error);
+  });
